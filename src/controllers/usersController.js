@@ -1,11 +1,13 @@
 const pool = require("../../db");
-const queries = require("./queries");
+const queries = require("../queries/usersQueries");
 const bcrypt = require("bcryptjs");
 const jwtGenerator = require("../utils/jwtGenerator");
 
+// get all users
 const getUsers = async (req, res) => {
   try {
     const { rows: users } = await pool.query(queries.getUsers);
+
     res.status(200).json(users);
   } catch (error) {
     console.error(error);
@@ -13,10 +15,17 @@ const getUsers = async (req, res) => {
   }
 };
 
+// get specific User by its ID
 const getUsersByID = async (req, res) => {
   const id = req.params.id;
+
   try {
     const { rows: users } = await pool.query(queries.getUsersByID, [id]);
+
+    if (!users.length) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     res.status(200).json(users);
   } catch (error) {
     console.error(error);
@@ -24,8 +33,11 @@ const getUsersByID = async (req, res) => {
   }
 };
 
+// register a user if it doesn't already exist in database and encrypt given password to store in database
+// if successful, returns a token to the frontend that can later be passed for authorization purposes in later API calls
 const registerUser = async (req, res) => {
   const { email, password, first_name, last_name } = req.body;
+
   try {
     const { rows: users } = await pool.query(queries.getUsersByEmail, [email]);
 
@@ -33,10 +45,7 @@ const registerUser = async (req, res) => {
       return res.status(401).json({ message: "User already exists" });
     }
 
-    const saltRound = 10;
-    const salt = await bcrypt.genSalt(saltRound);
-
-    const hashed_password = await bcrypt.hash(password, salt);
+    const hashed_password = await hashPassword(password);
 
     const newUser = await pool.query(queries.registerUser, [
       email,
@@ -54,8 +63,11 @@ const registerUser = async (req, res) => {
   }
 };
 
+//login user by comparing given password with password in database
+// if successful, returns a token to the frontend that can later be passed for authorization purposes in later API calls
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
+
   try {
     const { rows: users } = await pool.query(queries.getUsersByEmail, [email]);
 
@@ -64,7 +76,7 @@ const loginUser = async (req, res) => {
         .status(401)
         .json({ message: "Password or email is incorrect" });
     }
-    console.log(users[0].hashed_password);
+
     const validPassword = await bcrypt.compare(
       password,
       users[0].hashed_password
@@ -77,6 +89,7 @@ const loginUser = async (req, res) => {
     }
 
     const token = jwtGenerator(users[0].user_id);
+
     res.status(200).json(token);
   } catch (error) {
     console.error(error);
@@ -84,9 +97,17 @@ const loginUser = async (req, res) => {
   }
 };
 
+// helper function to hash password
+const hashPassword = async (password) => {
+  const saltRound = 10;
+  const salt = await bcrypt.genSalt(saltRound);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  return hashedPassword;
+};
+
+// verify user token
 const verifyUser = async (req, res) => {
   try {
-    console.log(req.user);
     res.json(true);
   } catch (err) {
     res.status(500).json({ message: "Internal server error" });
@@ -99,6 +120,4 @@ module.exports = {
   registerUser,
   loginUser,
   verifyUser,
-  //   getMoviesByEmail,
-  //   addMovie,
 };

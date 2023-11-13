@@ -1,7 +1,11 @@
 const getTodos = "SELECT * FROM todos";
+
 const getTodosByID = "SELECT * FROM todos WHERE todo_id = $1";
+
 const getTodosByCategory = "SELECT * FROM todos WHERE category = $1";
+
 const getTodosByCurrentStatus = "SELECT * FROM todos WHERE current_status = $1";
+
 const getTodosByOwner = "SELECT * FROM todos WHERE todo_owner = $1";
 
 const addTodo =
