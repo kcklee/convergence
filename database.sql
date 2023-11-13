@@ -9,7 +9,7 @@ CREATE TABLE users (
     last_name VARCHAR(255)
 );
 
--- Create movies table
+-- Create todos table
 CREATE TABLE todos (
     todo_id SERIAL PRIMARY KEY,
     task VARCHAR(255),

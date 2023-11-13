@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
+//middleware to verify token and authorize person
 module.exports = async (req, res, next) => {
   try {
     const jwtToken = req.header("token");
