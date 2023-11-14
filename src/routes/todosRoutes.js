@@ -19,6 +19,20 @@ router.get("/currentStatus/:currentStatus", controller.getTodosByCurrentStatus);
 // route used to get Todos of given owner
 router.get("/owner/:owner", controller.getTodosByOwner);
 
+// route used to get all Todos in given category for given user
+router.get(
+  "/user-specific/category/:category",
+  authorization,
+  controller.getTodosByCategoryUserSpecific
+);
+
+// route used to get all Todos with given status for given user
+router.get(
+  "/user-specific/currentStatus/:currentStatus",
+  authorization,
+  controller.getTodosByCurrentStatusUserSpecific
+);
+
 // route used to add a Todo (keep tracking of user)
 router.post("/", authorization, controller.addTodo);
 
