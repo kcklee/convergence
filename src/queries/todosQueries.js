@@ -8,6 +8,12 @@ const getTodosByCurrentStatus = "SELECT * FROM todos WHERE current_status = $1";
 
 const getTodosByOwner = "SELECT * FROM todos WHERE todo_owner = $1";
 
+const getTodosByCategoryUserSpecific =
+  "SELECT * FROM todos WHERE category = $1 AND todo_owner = $2";
+
+const getTodosByCurrentStatusUserSpecific =
+  "SELECT * FROM todos WHERE current_status = $1 AND todo_owner = $2";
+
 const addTodo =
   "INSERT INTO todos (task, category, current_status, todo_owner) VALUES ($1, $2, $3, $4)";
 
@@ -22,6 +28,8 @@ module.exports = {
   getTodosByCategory,
   getTodosByCurrentStatus,
   getTodosByOwner,
+  getTodosByCategoryUserSpecific,
+  getTodosByCurrentStatusUserSpecific,
   addTodo,
   removeTodo,
   updateTodo,

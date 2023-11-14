@@ -34,7 +34,6 @@ const getTodosByID = async (req, res) => {
 // get all Todos in given category
 const getTodosByCategory = async (req, res) => {
   const category = req.params.category;
-
   try {
     const { rows: todos } = await pool.query(queries.getTodosByCategory, [
       category,
@@ -69,6 +68,39 @@ const getTodosByOwner = async (req, res) => {
 
   try {
     const { rows: todos } = await pool.query(queries.getTodosByOwner, [owner]);
+
+    res.status(200).json(todos);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// get all Todos in given category for given user
+const getTodosByCategoryUserSpecific = async (req, res) => {
+  const category = req.params.category;
+  try {
+    const { rows: todos } = await pool.query(
+      queries.getTodosByCategoryUserSpecific,
+      [category, req.user]
+    );
+
+    res.status(200).json(todos);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// get all Todos with given status for given user
+const getTodosByCurrentStatusUserSpecific = async (req, res) => {
+  const currentStatus = req.params.currentStatus;
+
+  try {
+    const { rows: todos } = await pool.query(
+      queries.getTodosByCurrentStatusUserSpecific,
+      [currentStatus, req.user]
+    );
 
     res.status(200).json(todos);
   } catch (error) {
@@ -184,6 +216,8 @@ module.exports = {
   getTodosByCategory,
   getTodosByCurrentStatus,
   getTodosByOwner,
+  getTodosByCategoryUserSpecific,
+  getTodosByCurrentStatusUserSpecific,
   addTodo,
   removeTodo,
   updateTodo,
